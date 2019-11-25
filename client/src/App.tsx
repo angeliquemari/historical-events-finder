@@ -1,12 +1,13 @@
 import * as React from 'react';
 import axios from 'axios';
 import Search from './Search';
+import Results from './Results';
 
 interface AppProps {}
 interface AppState {
-  searchWords: string | undefined,
-  pageNumber: number | undefined,
-  pageCount: number | undefined,
+  searchWords: string,
+  pageNumber: number,
+  pageCount: number,
   searchResults: any[]
 }
 
@@ -20,6 +21,7 @@ export default class App extends React.Component<AppProps, AppState> {
       searchResults: []
     };
     this.searchEvents = this.searchEvents.bind(this);
+    this.changePage = this.changePage.bind(this);
   }
 
   getEvents(searchWords: string, pageNumber: number) {
@@ -29,7 +31,6 @@ export default class App extends React.Component<AppProps, AppState> {
           let pageLinks = response.headers.link.split(', ');
           let lastPageLink = pageLinks[pageLinks.length - 1];
           let lastPageNumber = Number(lastPageLink.match(/&_page=\d+>/)[0].match(/\d+/)[0]);
-          // console.log('response.data:', response.data);
           this.setState({
             searchWords: searchWords,
             pageNumber: pageNumber,
@@ -47,12 +48,18 @@ export default class App extends React.Component<AppProps, AppState> {
     let searchWords = (document.getElementById('search-input') as HTMLInputElement).value;
     this.getEvents(searchWords, 1);
   }
+
+  changePage(data: {selected: number}) {
+    let pageNumber = data.selected + 1;
+    this.getEvents(this.state.searchWords, pageNumber);
+  }
+
   render() {
       return (
         <div>
           <h1>Historical Events Finder</h1>
           <Search searchEvents={this.searchEvents} />
-          {/* <Results searchResults={this.state.searchResults} pageCount={this.state.pageCount} changePage={this.changePage} /> */}
+          <Results searchResults={this.state.searchResults} pageCount={this.state.pageCount} changePage={this.changePage} />
         </div>
       );
   }
