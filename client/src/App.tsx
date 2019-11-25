@@ -2,8 +2,8 @@ import * as React from 'react';
 import axios from 'axios';
 import Search from './Search';
 
-type AppProps = {}
-type AppState = {
+interface AppProps {}
+interface AppState {
   searchWords: string | undefined,
   pageNumber: number | undefined,
   pageCount: number | undefined,
