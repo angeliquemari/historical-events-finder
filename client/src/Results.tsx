@@ -6,7 +6,9 @@ interface ResultsProps {
   pageCount: number;
   changePage: (data: { selected: number }) => void;
   editMode: boolean;
-  editRecord: () => void;
+  editRecord: ({}) => void;
+  setCurrentRecord: () => void;
+  currentRecord: { id: number; date: string; description: string };
   saveRecord: () => void;
 }
 
@@ -31,7 +33,17 @@ export default function Results(Props: ResultsProps) {
                       <td>{event.date}</td>
                       <td>{event.description}</td>
                       <td>
-                        <button onClick={Props.editRecord}>Edit</button>
+                        <button
+                          onClick={() =>
+                            Props.editRecord({
+                              id: event.id,
+                              date: event.date,
+                              description: event.description
+                            })
+                          }
+                        >
+                          Edit
+                        </button>
                       </td>
                     </tr>
                   );
@@ -52,8 +64,16 @@ export default function Results(Props: ResultsProps) {
           )}
           {Props.editMode && (
             <div>
-              <input placeholder="Date"></input>
-              <input placeholder="Description"></input>
+              <input
+                id="date-input"
+                onChange={Props.setCurrentRecord}
+                value={Props.currentRecord.date}
+              ></input>
+              <input
+                id="description-input"
+                onChange={Props.setCurrentRecord}
+                value={Props.currentRecord.description}
+              ></input>
               <button onClick={Props.saveRecord}>Save</button>
             </div>
           )}

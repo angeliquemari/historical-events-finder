@@ -1,5 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
 import Search from './Search';
 import Results from './Results';
 
@@ -10,6 +11,7 @@ interface AppState {
   pageCount: number;
   searchResults: any[];
   editMode: boolean;
+  currentRecord: { id: number; date: string; description: string };
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -20,11 +22,13 @@ export default class App extends React.Component<AppProps, AppState> {
       pageNumber: undefined,
       pageCount: undefined,
       searchResults: [],
-      editMode: false
+      editMode: false,
+      currentRecord: { id: 0, date: '', description: '' }
     };
     this.searchEvents = this.searchEvents.bind(this);
     this.changePage = this.changePage.bind(this);
     this.editRecord = this.editRecord.bind(this);
+    this.setCurrentRecord = this.setCurrentRecord.bind(this);
     this.saveRecord = this.saveRecord.bind(this);
   }
 
@@ -59,13 +63,33 @@ export default class App extends React.Component<AppProps, AppState> {
     this.getEvents(this.state.searchWords, pageNumber);
   }
 
-  editRecord() {
-    this.setState({ editMode: true });
+  editRecord(record: { id: number; date: string; description: string }) {
+    this.setState({ editMode: true, currentRecord: record });
+  }
+
+  setCurrentRecord() {
+    let date = (document.getElementById('date-input') as HTMLInputElement).value;
+    let description = (document.getElementById('description-input') as HTMLInputElement).value;
+    this.setState({
+      currentRecord: { id: this.state.currentRecord.id, date: date, description: description }
+    });
   }
 
   saveRecord() {
-    // patch request to server
-    this.setState({ editMode: false });
+    axios
+      .patch(`/events/${this.state.currentRecord.id}`, this.state.currentRecord)
+      .then(() => {
+        return this.setState({
+          editMode: false,
+          currentRecord: { id: 0, date: '', description: '' }
+        });
+      })
+      .then(() => {
+        return this.getEvents(this.state.searchWords, this.state.pageNumber);
+      })
+      .catch((err: string) => {
+        console.log('Error:', err);
+      });
   }
 
   render() {
@@ -79,6 +103,8 @@ export default class App extends React.Component<AppProps, AppState> {
           changePage={this.changePage}
           editMode={this.state.editMode}
           editRecord={this.editRecord}
+          setCurrentRecord={this.setCurrentRecord}
+          currentRecord={this.state.currentRecord}
           saveRecord={this.saveRecord}
         />
       </div>
