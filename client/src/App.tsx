@@ -24,8 +24,8 @@ export default class App extends React.Component<AppProps, AppState> {
     };
     this.searchEvents = this.searchEvents.bind(this);
     this.changePage = this.changePage.bind(this);
-    this.editResults = this.editResults.bind(this);
-    this.saveResults = this.saveResults.bind(this);
+    this.editRecord = this.editRecord.bind(this);
+    this.saveRecord = this.saveRecord.bind(this);
   }
 
   getEvents(searchWords: string, pageNumber: number) {
@@ -59,11 +59,11 @@ export default class App extends React.Component<AppProps, AppState> {
     this.getEvents(this.state.searchWords, pageNumber);
   }
 
-  editResults() {
+  editRecord() {
     this.setState({ editMode: true });
   }
 
-  saveResults() {
+  saveRecord() {
     // patch request to server
     this.setState({ editMode: false });
   }
@@ -77,8 +77,9 @@ export default class App extends React.Component<AppProps, AppState> {
           searchResults={this.state.searchResults}
           pageCount={this.state.pageCount}
           changePage={this.changePage}
-          editResults={this.editResults}
-          saveResults={this.saveResults}
+          editMode={this.state.editMode}
+          editRecord={this.editRecord}
+          saveRecord={this.saveRecord}
         />
       </div>
     );
